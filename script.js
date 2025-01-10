@@ -7,111 +7,110 @@ function getComputerChoice(){
     let computerChoice = "";
     // IF randomNumber == 1 THEN Rock
     if(randomNumber == 1){
-        computerChoice = "Rock";
+        computerChoice = "rock";
         return computerChoice;
     }
     // IF randomNumber == 2 THEN Paper
     else if(randomNumber == 2){
-        computerChoice = "Paper";
+        computerChoice = "paper";
         return computerChoice;
     }
     // IF randomNumber == 3 THEN scissor
     else{
-        computerChoice = "Scissor";
+        computerChoice = "scissor";
         return computerChoice;
     }
-}
-// Create a function that will get the user's choice
-function getHumanChoice(){
-    // Declare variable for humanChoice
-    let humanChoice;
-    let invalid = true;
-    while (invalid){
-        // Get the humanChoice value using Prompt
-        humanChoice = prompt("Rock, Paper, Scissor?: ");
-        // Capitalize the choices to make it easier to compare to computer choice
-        humanChoice = (humanChoice.charAt(0)).toUpperCase() + humanChoice.slice(1).toLowerCase();
-        // IF humanChoice is within the choices(Rock,Paper,Scissor) THEN return humanChoice ELSE try again
-        if (humanChoice == "Rock" || humanChoice == "Paper" || humanChoice == "Scissor"){
-            invalid = false;
-        }
-        
-        else{
-            alert("Rock, Paper, or Scissor ONLY!");  
-        }
-    }
-    return humanChoice;
-        
 }
 // Declare global variable for the scores
 let humanScore = 0;
 let computerScore = 0;
 // create a function that will compare the answer and decide the winner
-function playRound(humanChoice,computerChoice){
-    let p = humanChoice;
-    let com = computerChoice;
+function playRound(event){
+    const p = event.target.id;
+    const com = getComputerChoice();
+    let win = true;
+    let draw = false;
+    
     // Check the Winner
-    if (p==="Rock" && com==="Scissor"){
-        console.log(`You win! ${p} beats ${com}`);
-        humanScore++;
+        //If player wins
+    if (p==="rock" && com==="scissor" || p==="paper" && com==="rock" || p==="scissor" && com==="paper"){
+        win = true;
+    }   
+        //If computer wins
+    else if (com==="rock" && p==="scissor" || com==="scissor" && p==="paper" || com==="paper" && p==="rock"){
+        win = false;
     }
-    else if (p==="Paper" && com==="Rock"){
-        console.log(`You win! ${p} beats ${com}`);
-        humanScore++;
-    }
-    else if (p==="Scissor" && com==="Paper"){
-        console.log(`You win! ${p} beats ${com}`);
-        humanScore++;
-    }
-    else if (com==="Rock" && p==="Scissor"){
-        console.log(`You Lose! ${com} beats ${p}`);
-        computerScore++;
-    }
-    else if (com==="Scissor" && p==="Paper"){
-        console.log(`You Lose! ${com} beats ${p}`);
-        computerScore++;
-    }
-    else if (com==="Paper" && p==="Rock"){
-        console.log(`You Lose! ${com} beats ${p}`);
-        computerScore++;
-    }
+        //if draw
     else{
-        console.log(`Draw! Player:${p} vs Computer:${com}`);
+        win = false;
+        draw = true;
     }
-}
-
-// Create a function that will start the game repeatedly 5 times
-function playGame(){
-    let humanChoice;
-    let computerChoice;
-    for (count = 1;count <= 5;++count){
-        humanChoice = getHumanChoice();
-        computerChoice = getComputerChoice();
-        playRound(humanChoice,computerChoice);
-        console.log(`Round:${count}`);
-        console.log(`human:${humanScore} Computer:${computerScore}`);
+    if(win){
+        winner.textContent = `YOU WIN! Player: ${p} | Computer: ${com}`
+        humanScore++;
     }
-    if (humanScore>computerScore){
-        console.log("Final Winner: Player!");
+    else if(!win){
+        winner.textContent = `YOU LOSE! Player: ${p} | Computer: ${com}`
+        computerScore++;
     }
-    else if (computerScore > humanScore){
-        console.log("Final Winner: Computer!");
+    else if(draw){
+        winner.textContent = `ITS A DRAW! Player: ${p} | Computer: ${com}`
     }
-    else{
-        console.log("DRAWWWW!!!");
-    }
-    playAgain();
-}
-// Create a function to play again
-function playAgain(){
-    let again = true;
-    while (again){
-        again = confirm("Do you want to play again?");
-        if (again){
-            playGame();
+    if(humanScore == 5 || computerScore == 5){
+        if (humanScore == 5){
+            finalWinner.textContent = "PLAYER WIN!";
         }
+        else if(computerScore == 5){
+            finalWinner.textContent = "COMPUTER WIN!";
+        }
+        container.insertBefore(resetButton,result);
+        rpsButtons.forEach(button => {
+            button.disabled = true;
+        })  
     }
-    console.log("Thanks for playing!")
+    score.textContent = `SCORE: Human: ${humanScore} | Computer: ${computerScore}`;  
+}
+     
+
+function reset(){
+    winner.textContent = "";
+    finalWinner.textContent = "";
+    score.textContent = "";
+    humanScore = 0;
+    computerScore = 0;
+    humanWin = false;
+    computerWin = false;
+    rpsButtons.forEach(button => {
+        button.disabled = false;
+    })
+    resetButton.remove();  
 }
 
-playGame();
+//declare variables to get html elemets
+const rockBtn = document.querySelector("#rock");
+const paperBtn = document.querySelector("#paper");
+const scissorBtn = document.querySelector("#scissor");
+const result = document.querySelector("#result")
+const btnContainer = document.querySelector(".btnContainer")
+const rpsButtons = document.querySelectorAll(".rpsButtons")
+const container = document.querySelector(".container")
+
+//create elemets
+const winner = document.createElement("div");
+const score = document.createElement("p");
+const finalWinner = document.createElement("p");
+const resetButton = document.createElement("button");
+finalWinner.style.cssText = "color: red; font-weight: bold;"
+
+
+rockBtn.addEventListener("click",playRound);
+paperBtn.addEventListener("click",playRound);
+scissorBtn.addEventListener("click",playRound);
+resetButton.addEventListener("click",reset);
+resetButton.textContent = "reset";
+
+result.appendChild(winner);
+result.appendChild(score);
+result.appendChild(finalWinner);
+
+
